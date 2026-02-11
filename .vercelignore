@@ -1,0 +1,8 @@
+# Игнорируем локальные файлы при деплое на Vercel
+.env.local
+.env*.local
+dev.db
+*.db
+*.db-journal
+node_modules/.cache
+.next/cache

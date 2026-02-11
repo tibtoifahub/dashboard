@@ -4,9 +4,13 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 async function main() {
-  // Default admin user
-  const adminLogin = "markaz";
-  const adminPassword = "2020331";
+  // Admin user - измените логин и пароль на свои
+  const adminLogin = process.env.ADMIN_LOGIN || "admin";
+  const adminPassword = process.env.ADMIN_PASSWORD || "ChangeMe123!";
+
+  if (adminPassword === "ChangeMe123!") {
+    console.warn("⚠️  ВНИМАНИЕ: Используется пароль по умолчанию! Установите ADMIN_PASSWORD в переменных окружения.");
+  }
 
   const passwordHash = await bcrypt.hash(adminPassword, 10);
 

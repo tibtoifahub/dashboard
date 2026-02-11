@@ -40,8 +40,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
         <h1 className="mb-4 text-center text-xl font-semibold">Вход в панель аттестации</h1>
         <p className="mb-4 rounded-md bg-slate-50 p-3 text-xs text-slate-600">
-          Внутренняя система центра аттестации. Используйте выданный логин и пароль. Для демо-админа: markaz /
-          2020331.
+          Внутренняя система центра аттестации. Используйте выданный логин и пароль.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
