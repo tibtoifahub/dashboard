@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Без @apply, обычный CSS */
+body {
+  /* bg-slate-50 */
+  background-color: #f8fafc;
+  /* text-slate-900 */
+  color: #020617;
+}

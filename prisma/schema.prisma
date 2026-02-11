@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum Role {
+  ADMIN
+  REGION
+}
+
+enum Profession {
+  DOCTOR
+  NURSE
+}
+
+enum ModuleStatus {
+  PASSED
+  FAILED
+  NO_SHOW_1
+  NO_SHOW_2
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  login       String   @unique
+  passwordHash String
+  role        Role
+  regionId    Int?
+  region      Region?  @relation(fields: [regionId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Region {
+  id        Int              @id @default(autoincrement())
+  name      String
+  brigades  MedicalBrigade[]
+  candidates Candidate[]
+  users     User[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model MedicalBrigade {
+  id        Int        @id @default(autoincrement())
+  name      String
+  regionId  Int
+  region    Region     @relation(fields: [regionId], references: [id])
+  candidates Candidate[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Candidate {
+  id           Int            @id @default(autoincrement())
+  fullName     String         @default("")
+  pinfl        String         @unique
+  profession   Profession
+  regionId     Int
+  region       Region         @relation(fields: [regionId], references: [id])
+  brigadeId    Int
+  brigade      MedicalBrigade @relation(fields: [brigadeId], references: [id])
+  cert1        Boolean        @default(false)
+  cert2        Boolean        @default(false)
+  cert3        Boolean        @default(false)
+  cert4        Boolean        @default(false)
+  cert1Note    String?        
+  cert2Note    String?
+  cert3Note    String?
+  cert4Note    String?
+  moduleResults ModuleResult[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([regionId, profession])
+  @@index([brigadeId])
+}
+
+model ModuleResult {
+  id           Int          @id @default(autoincrement())
+  candidateId  Int
+  candidate    Candidate    @relation(fields: [candidateId], references: [id])
+  moduleNumber Int
+  status       ModuleStatus
+  attemptNumber Int
+  isRetake     Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([candidateId, moduleNumber, attemptNumber])
+  @@index([candidateId, moduleNumber])
+}
+
