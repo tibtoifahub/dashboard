@@ -316,24 +316,17 @@ export function StatisticsDashboard({ role }: Props) {
                   <td className="whitespace-nowrap border-r border-slate-200 px-3 py-2 font-medium text-slate-800">{r.name}</td>
                   <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{r.totalSlots}</td>
                   <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.vacant}</td>
-                  {[1, 2, 3, 4].map((n) => {
+                  {([1, 2, 3, 4] as const).map((n) => {
                     const certKey = `cert${n}` as keyof typeof r;
                     const certVal = Number(r[certKey] ?? 0);
                     return (
                       <Fragment key={`group-${n}`}>
                         <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{certVal}</td>
                         <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.totalSlots - certVal}</td>
-                        {(() => {
-                          const key = n as 1 | 2 | 3 | 4;
-                          return (
-                            <>
-                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].PASSED}</td>
-                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].FAILED}</td>
-                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].NO_SHOW_1}</td>
-                              <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">{r.modules[key].NO_SHOW_2}</td>
-                            </>
-                          );
-                        })()}
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].PASSED}</td>
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].FAILED}</td>
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_1}</td>
+                        <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_2}</td>
                       </Fragment>
                     );
                   })}
