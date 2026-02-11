@@ -323,10 +323,17 @@ export function StatisticsDashboard({ role }: Props) {
                       <Fragment key={`group-${n}`}>
                         <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{certVal}</td>
                         <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.totalSlots - certVal}</td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].PASSED}</td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].FAILED}</td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_1}</td>
-                        <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_2}</td>
+                        {(() => {
+                          const key = n as 1 | 2 | 3 | 4;
+                          return (
+                            <>
+                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].PASSED}</td>
+                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].FAILED}</td>
+                              <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[key].NO_SHOW_1}</td>
+                              <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">{r.modules[key].NO_SHOW_2}</td>
+                            </>
+                          );
+                        })()}
                       </Fragment>
                     );
                   })}
