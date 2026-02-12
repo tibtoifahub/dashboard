@@ -3,8 +3,10 @@
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +30,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Неверный логин или пароль");
+      setError(t("login.error"));
       return;
     }
 
@@ -38,13 +40,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
-        <h1 className="mb-4 text-center text-xl font-semibold">Вход в панель аттестации</h1>
+        <h1 className="mb-4 text-center text-xl font-semibold">{t("login.title")}</h1>
         <p className="mb-4 rounded-md bg-slate-50 p-3 text-xs text-slate-600">
-          Внутренняя система центра аттестации. Используйте выданный логин и пароль.
+          {t("login.description")}
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Логин</label>
+            <label className="mb-1 block text-sm font-medium">{t("login.username")}</label>
             <input
               type="text"
               value={login}
@@ -54,7 +56,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Пароль</label>
+            <label className="mb-1 block text-sm font-medium">{t("login.password")}</label>
             <input
               type="password"
               value={password}
@@ -69,11 +71,10 @@ export default function LoginPage() {
             disabled={loading}
             className="flex w-full items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-70"
           >
-            {loading ? "Вход..." : "Войти"}
+            {loading ? t("login.signingIn") : t("login.login")}
           </button>
         </form>
       </div>
     </div>
   );
 }
-
