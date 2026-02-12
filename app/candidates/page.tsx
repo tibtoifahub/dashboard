@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "@/lib/i18n";
 import { DataTable } from "@/components/ui/DataTable";
 
 interface CandidateRow {
@@ -35,6 +36,7 @@ type NoteModal = {
 type RegionOption = { id: number; name: string };
 
 export default function CandidatesPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [data, setData] = useState<CandidateRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,7 +91,7 @@ export default function CandidatesPage() {
       setData(mapped);
       setInfo(null);
     } catch (e: any) {
-      setError(e.message ?? "Ошибка загрузки");
+      setError(e.message ?? t("candidates.loadError"));
     } finally {
       setLoading(false);
     }
@@ -119,9 +121,9 @@ export default function CandidatesPage() {
     });
     if (!res.ok) {
       const json = await res.json().catch(() => null);
-      throw new Error(json?.error ?? "Ошибка сохранения");
+      throw new Error(json?.error ?? t("candidates.saveError"));
     }
-    setInfo("Изменения сохранены");
+    setInfo(t("candidates.changesSaved"));
     await load();
   }
 
@@ -143,7 +145,7 @@ export default function CandidatesPage() {
         !c.passedModule1 ? 1 : !c.passedModule2 ? 2 : !c.passedModule3 ? 3 : 4;
       return (
         <span className="text-xs text-slate-400">
-          Сначала сдайте модуль {firstMissing}
+          {t("candidates.firstPassModule")} {firstMissing}
         </span>
       );
     }
@@ -166,8 +168,8 @@ export default function CandidatesPage() {
           className="rounded border border-slate-300 px-2 py-1 text-xs"
           onChange={(e) => updateCert(e.target.value === "yes")}
         >
-          <option value="yes">Есть</option>
-          <option value="no">Нет</option>
+          <option value="yes">{t("candidates.has")}</option>
+          <option value="no">{t("candidates.no")}</option>
         </select>
         {!value && (
           <button
@@ -182,7 +184,7 @@ export default function CandidatesPage() {
             }
             className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-100"
           >
-            {note ? (note.length > 40 ? `${note.slice(0, 40)}…` : note) : "Добавить примечание"}
+            {note ? (note.length > 40 ? `${note.slice(0, 40)}…` : note) : t("candidates.addNote")}
           </button>
         )}
       </div>
@@ -216,7 +218,7 @@ export default function CandidatesPage() {
           })
         )
       );
-      setInfo(`Сертификат (модуль ${moduleNum}) для всех: ${value ? "Есть" : "Нет"}`);
+      setInfo(`${t(`candidates.cert${moduleNum}`)} ${t("candidates.applyToAll")}: ${value ? t("candidates.has") : t("candidates.no")}`);
       await load();
     } catch (err: any) {
       setError(err.message);
@@ -228,13 +230,13 @@ export default function CandidatesPage() {
       accessorKey: "regionName",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">Регион</span>
+          <span className="font-medium">{t("candidates.region")}</span>
           <select
             value={filterRegion}
             onChange={(e) => setFilterRegion(e.target.value)}
             className="w-full max-w-[180px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
           >
-            <option value="">Все регионы</option>
+            <option value="">{t("candidates.allRegions")}</option>
             {regionOptions.map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -248,10 +250,10 @@ export default function CandidatesPage() {
       accessorKey: "fullName",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">ФИО</span>
+          <span className="font-medium">{t("candidates.fio")}</span>
           <input
             type="text"
-            placeholder="Поиск по ФИО..."
+            placeholder={`${t("common.search")} ${t("candidates.fio")}...`}
             value={filterFio}
             onChange={(e) => setFilterFio(e.target.value)}
             className="w-full min-w-[140px] max-w-[200px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700 placeholder:text-slate-400"
@@ -288,17 +290,17 @@ export default function CandidatesPage() {
     },
     {
       accessorKey: "profession",
-      header: "Профессия",
+      header: () => t("candidates.profession"),
       cell: ({ getValue }) => {
         const profession = getValue<"DOCTOR" | "NURSE">();
-        return profession === "DOCTOR" ? "Врач" : "Медсестра";
+        return profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses");
       }
     },
     {
       id: "cert1",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">Сертификат (модуль 1)</span>
+          <span className="font-medium">{t("candidates.cert1")}</span>
           <select
             className="w-full max-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
             defaultValue=""
@@ -309,9 +311,9 @@ export default function CandidatesPage() {
               e.target.value = "";
             }}
           >
-            <option value="">Применить ко всем</option>
-            <option value="yes">Есть</option>
-            <option value="no">Нет</option>
+            <option value="">{t("candidates.applyToAll")}</option>
+            <option value="yes">{t("candidates.has")}</option>
+            <option value="no">{t("candidates.no")}</option>
           </select>
         </div>
       ),
@@ -321,7 +323,7 @@ export default function CandidatesPage() {
       id: "cert2",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">Сертификат (модуль 2)</span>
+          <span className="font-medium">{t("candidates.cert2")}</span>
           <select
             className="w-full max-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
             defaultValue=""
@@ -332,9 +334,9 @@ export default function CandidatesPage() {
               e.target.value = "";
             }}
           >
-            <option value="">Применить ко всем</option>
-            <option value="yes">Есть</option>
-            <option value="no">Нет</option>
+            <option value="">{t("candidates.applyToAll")}</option>
+            <option value="yes">{t("candidates.has")}</option>
+            <option value="no">{t("candidates.no")}</option>
           </select>
         </div>
       ),
@@ -344,7 +346,7 @@ export default function CandidatesPage() {
       id: "cert3",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">Сертификат (модуль 3)</span>
+          <span className="font-medium">{t("candidates.cert3")}</span>
           <select
             className="w-full max-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
             defaultValue=""
@@ -355,9 +357,9 @@ export default function CandidatesPage() {
               e.target.value = "";
             }}
           >
-            <option value="">Применить ко всем</option>
-            <option value="yes">Есть</option>
-            <option value="no">Нет</option>
+            <option value="">{t("candidates.applyToAll")}</option>
+            <option value="yes">{t("candidates.has")}</option>
+            <option value="no">{t("candidates.no")}</option>
           </select>
         </div>
       ),
@@ -367,7 +369,7 @@ export default function CandidatesPage() {
       id: "cert4",
       header: () => (
         <div className="flex flex-col gap-1.5">
-          <span className="font-medium">Сертификат (модуль 4)</span>
+          <span className="font-medium">{t("candidates.cert4")}</span>
           <select
             className="w-full max-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
             defaultValue=""
@@ -378,9 +380,9 @@ export default function CandidatesPage() {
               e.target.value = "";
             }}
           >
-            <option value="">Применить ко всем</option>
-            <option value="yes">Есть</option>
-            <option value="no">Нет</option>
+            <option value="">{t("candidates.applyToAll")}</option>
+            <option value="yes">{t("candidates.has")}</option>
+            <option value="no">{t("candidates.no")}</option>
           </select>
         </div>
       ),
@@ -395,11 +397,11 @@ export default function CandidatesPage() {
 
   async function handleImport() {
     if (!file) {
-      setError("Выберите файл Excel для импорта");
+      setError(t("candidates.selectFile"));
       return;
     }
     if (session?.user?.role === "ADMIN" && !importRegionId) {
-      setError("Выберите регион для импорта");
+      setError(t("candidates.selectRegionImport"));
       return;
     }
     setImporting(true);
@@ -418,13 +420,13 @@ export default function CandidatesPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json?.error ?? "Ошибка импорта");
+        throw new Error(json?.error ?? t("candidates.importError"));
       }
       setImportResult(json);
       setInfo(
         importMode === "add"
-          ? `Импорт завершён: добавлено ${json.imported}, пропущено ${json.skipped}`
-          : `Перезапись завершена: обработано ${json.imported} записей`
+          ? `${t("candidates.imported")}: ${json.imported}, ${t("candidates.skipped")}: ${json.skipped}`
+          : `${t("candidates.overwrite")}: ${json.imported}`
       );
       await load();
     } catch (err: any) {
@@ -438,7 +440,7 @@ export default function CandidatesPage() {
     <div className="mx-auto max-w-6xl space-y-4">
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold">Кандидаты</h1>
+          <h1 className="text-xl font-semibold">{t("candidates.title")}</h1>
           <div className="flex flex-wrap items-center gap-3 text-xs">
             {session?.user?.role === "ADMIN" && regions.length > 0 && (
               <select
@@ -452,25 +454,25 @@ export default function CandidatesPage() {
               </select>
             )}
             <label className="flex items-center gap-1.5">
-              <span className="text-slate-600">Режим:</span>
+              <span className="text-slate-600">{t("candidates.importMode")}:</span>
               <select
                 value={importMode}
                 onChange={(e) => setImportMode(e.target.value as "add" | "overwrite")}
                 className="rounded border border-slate-300 px-2 py-1.5"
               >
-                <option value="add">Добавить в свободные</option>
-                <option value="overwrite">Перезаписать список</option>
+                <option value="add">{t("candidates.addToVacant")}</option>
+                <option value="overwrite">{t("candidates.overwrite")}</option>
               </select>
             </label>
             <label className="flex items-center gap-1.5">
-              <span className="text-slate-600">Кого:</span>
+              <span className="text-slate-600">{t("candidates.profession")}:</span>
               <select
                 value={importProfession}
                 onChange={(e) => setImportProfession(e.target.value as "DOCTOR" | "NURSE")}
                 className="rounded border border-slate-300 px-2 py-1.5"
               >
-                <option value="DOCTOR">Врачи</option>
-                <option value="NURSE">Медсёстры</option>
+                <option value="DOCTOR">{t("candidates.doctors")}</option>
+                <option value="NURSE">{t("candidates.nurses")}</option>
               </select>
             </label>
             <input
@@ -484,7 +486,7 @@ export default function CandidatesPage() {
               disabled={importing || !file}
               className="rounded-md bg-slate-900 px-3 py-1.5 font-medium text-white hover:bg-slate-800 disabled:opacity-60"
             >
-              {importing ? "Импорт…" : "Импорт из Excel"}
+              {importing ? t("candidates.import") + "…" : t("candidates.import")}
             </button>
           </div>
         </div>
@@ -498,7 +500,7 @@ export default function CandidatesPage() {
                 : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
-            Врачи
+            {t("candidates.doctors")}
           </button>
           <button
             type="button"
@@ -509,31 +511,29 @@ export default function CandidatesPage() {
                 : "bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
-            Медсёстры
+            {t("candidates.nurses")}
           </button>
         </div>
       </div>
 
       <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
         <p>
-          Заполняйте свободные строки (<b>VACANT</b>). Сертификат 1 доступен всем; сертификаты 2–4 появляются после
-          сдачи предыдущего модуля (статус «Сдал» выставляет админ на странице Модули).
+          {t("candidates.info")}
         </p>
         <p className="mt-2 text-xs text-slate-600">
-          Импорт Excel: шаблон файла — одна колонка <b>ФИО</b>. Выберите режим «Добавить в свободные» или «Перезаписать список»
-          и профессию (Врачи / Медсёстры). В шапке колонок сертификатов можно применить «Есть» или «Нет» ко всем строкам.
+          {t("candidates.importInfo")}
         </p>
       </section>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       {info && <p className="text-sm text-emerald-700">{info}</p>}
 
-      {loading && <p className="text-sm text-slate-600">Загрузка...</p>}
+      {loading && <p className="text-sm text-slate-600">{t("common.loading")}</p>}
 
       {!loading && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold text-slate-700">
-            {profession === "DOCTOR" ? "Список врачей" : "Список медсестёр"}
+            {profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses")}
           </h2>
           <DataTable columns={columns} data={filteredData} />
         </section>
@@ -542,9 +542,9 @@ export default function CandidatesPage() {
       {importResult && (
         <div className="rounded-md bg-slate-50 p-3 text-xs text-slate-700">
           <div>
-            Импортировано: <b>{importResult.imported}</b>, пропущено: <b>{importResult.skipped}</b>
+            {t("candidates.imported")}: <b>{importResult.imported}</b>, {t("candidates.skipped")}: <b>{importResult.skipped}</b>
             {importResult.vacanciesCount !== undefined && (
-              <span className="ml-2 text-slate-500">(свободных слотов было: {importResult.vacanciesCount})</span>
+              <span className="ml-2 text-slate-500">({t("candidates.vacantSlots")}: {importResult.vacanciesCount})</span>
             )}
           </div>
           {importResult.message && (
@@ -552,11 +552,11 @@ export default function CandidatesPage() {
           )}
           {importResult.reasons?.length > 0 && (
             <details className="mt-1">
-              <summary className="cursor-pointer">Причины пропуска</summary>
+              <summary className="cursor-pointer">{t("candidates.skipReasons")}</summary>
               <ul className="mt-1 list-disc pl-5">
                 {importResult.reasons.map((r: any, idx: number) => (
                   <li key={idx}>
-                    Строка {r.rowIndex}: {r.reason} {r.pinfl && `(PINFL: ${r.pinfl})`}
+                    {t("candidates.skipRowReason")} {r.rowIndex}: {r.reason} {r.pinfl && `(PINFL: ${r.pinfl})`}
                   </li>
                 ))}
               </ul>
@@ -603,6 +603,7 @@ function NoteModalPanel({
   onSave: (text: string) => Promise<void>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [text, setText] = useState(initialNote);
   const [saving, setSaving] = useState(false);
 
@@ -616,12 +617,12 @@ function NoteModalPanel({
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-sm font-semibold text-slate-800">
-          Примечание — почему нет сертификата (модуль {moduleNum})
+          {t("candidates.noteModalTitle")} {moduleNum})
         </h3>
         <p className="mt-1 text-xs text-slate-500">{candidateName}</p>
         <textarea
           className="mt-3 min-h-[120px] w-full rounded border border-slate-300 p-3 text-sm"
-          placeholder="Укажите причину отсутствия сертификата..."
+          placeholder={t("candidates.notePlaceholder")}
           value={text}
           onChange={(e) => setText(e.target.value)}
           autoFocus
@@ -632,7 +633,7 @@ function NoteModalPanel({
             onClick={onClose}
             className="rounded border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
           >
-            Закрыть
+            {t("candidates.close")}
           </button>
           <button
             type="button"
@@ -644,7 +645,7 @@ function NoteModalPanel({
             disabled={saving}
             className="rounded bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-slate-800 disabled:opacity-60"
           >
-            {saving ? "Сохранение…" : "Сохранить"}
+            {saving ? t("candidates.saving") : t("common.save")}
           </button>
         </div>
       </div>

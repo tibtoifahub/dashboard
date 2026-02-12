@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { Fragment, useEffect, useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import {
   BarChart,
   Bar,
@@ -70,6 +70,7 @@ interface Props {
 }
 
 export function StatisticsDashboard({ role }: Props) {
+  const { t } = useTranslation();
   const [data, setData] = useState<SummaryResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,11 +88,11 @@ export function StatisticsDashboard({ role }: Props) {
         const res = await fetch("/api/statistics/summary");
         const json = await res.json();
         if (!res.ok) {
-          throw new Error(json?.error ?? "Ошибка загрузки статистики");
+          throw new Error(json?.error ?? t("statistics.loadingError"));
         }
         if (mounted) setData(json);
       } catch (e: any) {
-        if (mounted) setError(e.message ?? "Ошибка загрузки статистики");
+        if (mounted) setError(e.message ?? t("statistics.loadingError"));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -128,22 +129,22 @@ export function StatisticsDashboard({ role }: Props) {
   const funnelChartData = funnel.map((step) => ({
     label:
       step.step === "cert1"
-        ? "Сертификат 1"
+        ? t("candidates.cert1")
         : step.step === "module1"
-          ? "Модуль 1"
+          ? `${t("modules.module")} 1`
           : step.step === "module2"
-            ? "Модуль 2"
+            ? `${t("modules.module")} 2`
             : step.step === "module3"
-              ? "Модуль 3"
-              : "Модуль 4",
+              ? `${t("modules.module")} 3`
+              : `${t("modules.module")} 4`,
     value: step.count
   }));
 
   const statusLabels: Record<string, string> = {
-    PASSED: "Сдал",
-    FAILED: "Не сдал",
-    NO_SHOW_1: "Не пришёл 1 раз",
-    NO_SHOW_2: "Не пришёл 2 раз"
+    PASSED: t("modules.passed"),
+    FAILED: t("modules.failed"),
+    NO_SHOW_1: t("modules.noShow1"),
+    NO_SHOW_2: t("modules.noShow2")
   };
 
   const moduleStatusData = (mod: 1 | 2 | 3 | 4) => {
@@ -191,7 +192,7 @@ export function StatisticsDashboard({ role }: Props) {
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Статистика и аналитика</h1>
+        <h1 className="text-xl font-semibold">{t("statistics.title")}</h1>
         <a
           href="/api/statistics/export"
           className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
@@ -216,38 +217,38 @@ export function StatisticsDashboard({ role }: Props) {
       {/* KPI cards */}
       <section className="grid gap-4 sm:grid-cols-4 lg:grid-cols-6">
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">Всего мест</div>
+          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.totalSlots")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.totalSlots}</div>
           <p className="mt-1 text-xs text-slate-500">
-            Общее количество мест (врач + 4 медсестры на каждую бригаду).
+            {t("statistics.totalSlotsDesc")}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">Заполнено</div>
+          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.filled")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.filled}</div>
           <p className="mt-1 text-xs text-slate-500">
-            Места с указанным ФИО и ПИНФЛ (кандидат назначен).
+            {t("statistics.filledDesc")}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">Вакантно</div>
+          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.vacant")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.vacant}</div>
           <p className="mt-1 text-xs text-slate-500">
-            Свободные места без назначенного кандидата.
+            {t("statistics.vacantDesc")}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">Врачи</div>
+          <div className="text-xs font-medium uppercase text-slate-500">{t("candidates.doctors")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.doctorsFilled}</div>
           <p className="mt-1 text-xs text-slate-500">
-            Заполненные места по профессии «Врач».
+            {t("statistics.doctorsDesc")}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">Медсёстры</div>
+          <div className="text-xs font-medium uppercase text-slate-500">{t("candidates.nurses")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.nursesFilled}</div>
           <p className="mt-1 text-xs text-slate-500">
-            Заполненные места по профессии «Медсестра».
+            {t("statistics.nursesDesc")}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
@@ -268,7 +269,7 @@ export function StatisticsDashboard({ role }: Props) {
 
       {/* Region table — поднято над диаграммами */}
       <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-700">Регионы</h2>
+        <h2 className="text-sm font-semibold text-slate-700">{t("statistics.byRegion")}</h2>
         <p className="mb-3 text-xs text-slate-500">
           Подробная статистика по каждому региону: всего мест, вакансии, сертификат 1 (есть/нет), результаты экзаменов по модулям 1–4. Нажмите на заголовок для сортировки по основным колонкам.
         </p>
@@ -277,13 +278,13 @@ export function StatisticsDashboard({ role }: Props) {
             <thead className="bg-slate-50 text-xs text-slate-600">
               <tr>
                 <th rowSpan={2} className="border-r border-slate-200 px-3 py-2 align-middle font-medium normal-case">
-                  <button type="button" onClick={() => toggleRegionSort("name")}>Регион</button>
+                  <button type="button" onClick={() => toggleRegionSort("name")}>{t("admin.region")}</button>
                 </th>
                 <th rowSpan={2} className="border-r border-slate-200 px-3 py-2 align-middle font-medium normal-case">
-                  <button type="button" onClick={() => toggleRegionSort("totalSlots")}>Всего мест</button>
+                  <button type="button" onClick={() => toggleRegionSort("totalSlots")}>{t("statistics.totalSlots")}</button>
                 </th>
                 <th rowSpan={2} className="border-r-2 border-slate-300 px-3 py-2 align-middle font-medium normal-case">
-                  <button type="button" onClick={() => toggleRegionSort("vacant")}>Вакантно</button>
+                  <button type="button" onClick={() => toggleRegionSort("vacant")}>{t("statistics.vacant")}</button>
                 </th>
                 {[1, 2, 3, 4].map((n) => (
                   <Fragment key={`group-${n}`}>
@@ -317,27 +318,18 @@ export function StatisticsDashboard({ role }: Props) {
                   <td className="whitespace-nowrap border-r border-slate-200 px-3 py-2 font-medium text-slate-800">{r.name}</td>
                   <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{r.totalSlots}</td>
                   <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.vacant}</td>
-                  {([1, 2, 3, 4] as const).map((n) => {
-                    const key = n as 1 | 2 | 3 | 4;
+                  {([1, 2, 3, 4] as const).map((n: 1 | 2 | 3 | 4) => {
                     const certKey = `cert${n}` as keyof typeof r;
                     const certVal = Number(r[certKey] ?? 0);
                     return (
-                      <React.Fragment key={key}>
+                      <Fragment key={`group-${n}`}>
                         <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{certVal}</td>
                         <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.totalSlots - certVal}</td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">
-                          {r.modules[key].PASSED}
-                        </td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">
-                          {r.modules[key].FAILED}
-                        </td>
-                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">
-                          {r.modules[key].NO_SHOW_1}
-                        </td>
-                        <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">
-                          {r.modules[key].NO_SHOW_2}
-                        </td>
-                      </React.Fragment>
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].PASSED}</td>
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].FAILED}</td>
+                        <td className="border-r border-slate-200 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_1}</td>
+                        <td className="border-r-2 border-slate-300 px-2 py-2 text-right tabular-nums">{r.modules[n].NO_SHOW_2}</td>
+                      </Fragment>
                     );
                   })}
                 </tr>
@@ -350,15 +342,15 @@ export function StatisticsDashboard({ role }: Props) {
       {/* Problem regions — поднято над диаграммами */}
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700">Топ-5 по неявкам</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t("statistics.topNoShow")}</h2>
           <p className="mb-2 text-xs text-slate-500">
-            Регионы с наибольшим числом неявок на экзамен (1 и 2 раз по всем модулям).
+            {t("statistics.topNoShowDesc")}
           </p>
           <table className="min-w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-2 py-1">Регион</th>
-                <th className="px-2 py-1 text-right">Неявки</th>
+                <th className="px-2 py-1">{t("statistics.byRegion")}</th>
+                <th className="px-2 py-1 text-right">{t("statistics.noShows")}</th>
               </tr>
             </thead>
             <tbody>
@@ -394,15 +386,15 @@ export function StatisticsDashboard({ role }: Props) {
           </table>
         </div>
         <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700">Топ-5 по вакансиям</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t("statistics.topVacant")}</h2>
           <p className="mb-2 text-xs text-slate-500">
-            Регионы с наибольшим числом свободных (незаполненных) мест.
+            {t("statistics.topVacantDesc")}
           </p>
           <table className="min-w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-2 py-1">Регион</th>
-                <th className="px-2 py-1 text-right">Вакантно</th>
+                <th className="px-2 py-1">{t("statistics.byRegion")}</th>
+                <th className="px-2 py-1 text-right">{t("statistics.vacant")}</th>
               </tr>
             </thead>
             <tbody>
@@ -451,8 +443,8 @@ export function StatisticsDashboard({ role }: Props) {
                 <YAxis unit="%" />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="DOCTOR" name="Врачи" fill="#0f172a" />
-                <Bar dataKey="NURSE" name="Медсёстры" fill="#38bdf8" />
+                <Bar dataKey="DOCTOR" name={t("candidates.doctors")} fill="#0f172a" />
+                <Bar dataKey="NURSE" name={t("candidates.nurses")} fill="#38bdf8" />
               </BarChart>
             </ResponsiveContainer>
           </div>

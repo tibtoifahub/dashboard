@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
 
 type Region = {
   id: number;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function AdminRegionsList({ regions }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
@@ -34,7 +36,7 @@ export function AdminRegionsList({ regions }: Props) {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error ?? "Ошибка сохранения");
+        setError(json?.error ?? t("common.error"));
         return;
       }
       setEditingId(null);
@@ -53,7 +55,7 @@ export function AdminRegionsList({ regions }: Props) {
       const res = await fetch(`/api/regions?id=${id}`, { method: "DELETE" });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error ?? "Ошибка удаления");
+        setError(json?.error ?? t("common.error"));
         return;
       }
       setConfirmId(null);
@@ -72,9 +74,9 @@ export function AdminRegionsList({ regions }: Props) {
         <thead className="bg-slate-50 text-xs uppercase text-slate-500">
           <tr>
             <th className="px-3 py-2">ID</th>
-            <th className="px-3 py-2">Регион</th>
-            <th className="px-3 py-2">Бригад</th>
-            <th className="px-3 py-2">Действия</th>
+            <th className="px-3 py-2">{t("admin.region")}</th>
+            <th className="px-3 py-2">{t("admin.brigades")}</th>
+            <th className="px-3 py-2">{t("common.filter")}</th>
           </tr>
         </thead>
         <tbody>
@@ -102,7 +104,7 @@ export function AdminRegionsList({ regions }: Props) {
                         disabled={saving}
                         className="rounded bg-slate-800 px-2 py-1 text-xs text-white hover:bg-slate-700 disabled:opacity-50"
                       >
-                        {saving ? "Сохранение…" : "Сохранить"}
+                        {saving ? t("common.loading") : t("admin.save")}
                       </button>
                       <button
                         type="button"
@@ -110,7 +112,7 @@ export function AdminRegionsList({ regions }: Props) {
                         disabled={saving}
                         className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
                       >
-                        Отмена
+                        {t("common.cancel")}
                       </button>
                     </span>
                   ) : (
@@ -129,19 +131,19 @@ export function AdminRegionsList({ regions }: Props) {
                         }}
                         className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
                       >
-                        Изменить число бригад
+                        {t("admin.changeBrigades")}
                       </button>
                     )}
                     {confirmId === r.id ? (
                       <>
-                        <span className="text-xs text-slate-600">Удалить всё?</span>
+                        <span className="text-xs text-slate-600">{t("admin.confirmDelete")}</span>
                         <button
                           type="button"
                           onClick={() => handleDelete(r.id)}
                           disabled={deletingId !== null}
                           className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
                         >
-                          {deletingId === r.id ? "Удаление…" : "Да"}
+                          {deletingId === r.id ? t("common.loading") : t("common.yes")}
                         </button>
                         <button
                           type="button"
@@ -149,7 +151,7 @@ export function AdminRegionsList({ regions }: Props) {
                           disabled={deletingId !== null}
                           className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
                         >
-                          Нет
+                          {t("common.no")}
                         </button>
                       </>
                     ) : (
@@ -158,7 +160,7 @@ export function AdminRegionsList({ regions }: Props) {
                         onClick={() => setConfirmId(r.id)}
                         className="rounded border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
                       >
-                        Удалить базу региона
+                        {t("admin.delete")}
                       </button>
                     )}
                   </span>
@@ -169,7 +171,7 @@ export function AdminRegionsList({ regions }: Props) {
         </tbody>
       </table>
       <p className="text-xs text-slate-500">
-        Можно изменить число мед. бригад (добавляются или удаляются последние бригады; при удалении данные кандидатов этих бригад удаляются). Удаление региона удалит все данные: бригады, кандидатов, результаты модулей и пользователей этого региона.
+        {t("admin.brigadeChangeInfo")}
       </p>
     </div>
   );

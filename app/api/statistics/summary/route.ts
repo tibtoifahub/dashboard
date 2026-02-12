@@ -67,13 +67,13 @@ export async function GET() {
     const filled = all.filter(isFilled).length;
     const vacant = totalSlots - filled;
 
-    const doctorsFilled = all.filter((c) => c.profession === "DOCTOR" && isFilled(c)).length;
-    const nursesFilled = all.filter((c) => c.profession === "NURSE" && isFilled(c)).length;
+    const doctorsFilled = all.filter((c: any) => c.profession === "DOCTOR" && isFilled(c)).length;
+    const nursesFilled = all.filter((c: any) => c.profession === "NURSE" && isFilled(c)).length;
 
-    const cert1Count = all.filter((c) => c.cert1).length;
-    const cert2Count = all.filter((c) => c.cert2).length;
-    const cert3Count = all.filter((c) => c.cert3).length;
-    const cert4Count = all.filter((c) => c.cert4).length;
+    const cert1Count = all.filter((c: any) => c.cert1).length;
+    const cert2Count = all.filter((c: any) => c.cert2).length;
+    const cert3Count = all.filter((c: any) => c.cert3).length;
+    const cert4Count = all.filter((c: any) => c.cert4).length;
 
     const moduleBuckets = emptyModuleBuckets();
     for (const c of all) {
@@ -119,18 +119,18 @@ export async function GET() {
   ];
 
   // Regional analytics
-  const regionsAnalytics = regions.map((r) => {
+  const regionsAnalytics = regions.map((r: any) => {
     const cs = r.candidates;
     const totalSlots = cs.length;
     const filled = cs.filter(isFilled).length;
     const vacant = totalSlots - filled;
-    const doctorsFilled = cs.filter((c) => c.profession === "DOCTOR" && isFilled(c)).length;
-    const nursesFilled = cs.filter((c) => c.profession === "NURSE" && isFilled(c)).length;
+    const doctorsFilled = cs.filter((c: any) => c.profession === "DOCTOR" && isFilled(c)).length;
+    const nursesFilled = cs.filter((c: any) => c.profession === "NURSE" && isFilled(c)).length;
 
-    const cert1 = cs.filter((c) => c.cert1).length;
-    const cert2 = cs.filter((c) => c.cert2).length;
-    const cert3 = cs.filter((c) => c.cert3).length;
-    const cert4 = cs.filter((c) => c.cert4).length;
+    const cert1 = cs.filter((c: any) => c.cert1).length;
+    const cert2 = cs.filter((c: any) => c.cert2).length;
+    const cert3 = cs.filter((c: any) => c.cert3).length;
+    const cert4 = cs.filter((c: any) => c.cert4).length;
 
     const moduleStatus = emptyModuleBuckets();
     for (const c of cs) {
@@ -172,7 +172,7 @@ export async function GET() {
     NURSE: { total: 0, cert1: 0, module1Passed: 0, module4Passed: 0 }
   };
 
-  const globalModuleMap = candidates.map((c) => ({
+  const globalModuleMap = candidates.map((c: any) => ({
     candidateId: c.id,
     profession: c.profession,
     cert1: c.cert1,
@@ -180,7 +180,7 @@ export async function GET() {
   }));
 
   for (const entry of globalModuleMap) {
-    const bucket = professionAnalytics[entry.profession];
+    const bucket = professionAnalytics[entry.profession as "DOCTOR" | "NURSE"];
     bucket.total += 1;
     if (entry.cert1) bucket.cert1 += 1;
     if (entry.moduleMap.get(1) === "PASSED") bucket.module1Passed += 1;
@@ -188,7 +188,7 @@ export async function GET() {
   }
 
   // Problem regions
-  const problemRegionsBase = regionsAnalytics.map((r) => {
+  const problemRegionsBase = regionsAnalytics.map((r: any) => {
     const modules = r.modules;
     const totalNoShow =
       modules[1].NO_SHOW_1 +

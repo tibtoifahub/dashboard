@@ -2,8 +2,10 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
 
 export function RegionCreateForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [name, setName] = useState("");
   const [brigadeCount, setBrigadeCount] = useState(1);
@@ -17,31 +19,49 @@ export function RegionCreateForm() {
     setSuccess(null);
 
     if (!name.trim()) {
-      setError("Введите название региона");
+      setError(t("regions.enterRegionName"));
       return;
     }
     if (brigadeCount <= 0) {
-      setError("Количество бригад должно быть больше нуля");
+      setError(t("regions.brigadeCountMustBePositive"));
       return;
     }
 
     setLoading(true);
+    setError(null);
+    setSuccess(null);
+    
     try {
       const res = await fetch("/api/regions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), brigadeCount })
       });
+      
       const json = await res.json().catch(() => null);
+      
       if (!res.ok) {
-        throw new Error(json?.error ?? "Ошибка создания региона");
+        const errorMessage = json?.error || t("regions.errorCreating");
+        // Проверяем на дубликат имени региона
+        if (res.status === 409) {
+          setError(t("regions.duplicateName") || errorMessage);
+        } else {
+          setError(errorMessage);
+        }
+        return;
       }
-      setSuccess(`Регион "${json.name}" создан с ${brigadeCount} бригадами`);
+      
+      setSuccess(`${t("regions.regionCreated")}: ${brigadeCount} ${t("regions.brigades").toLowerCase()}`);
       setName("");
       setBrigadeCount(1);
-      router.refresh();
+      
+      // Обновляем страницу через небольшую задержку для лучшего UX
+      setTimeout(() => {
+        router.refresh();
+      }, 500);
     } catch (err: any) {
-      setError(err.message ?? "Ошибка создания региона");
+      console.error("Error creating region:", err);
+      setError(err.message ?? t("regions.errorCreating"));
     } finally {
       setLoading(false);
     }
@@ -50,12 +70,12 @@ export function RegionCreateForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <div className="rounded-md bg-blue-50 p-3 text-xs text-blue-800">
-        При создании региона система автоматически добавляет слоты: <b>{brigadeCount}</b> врачей и{" "}
-        <b>{brigadeCount * 4}</b> медсестёр.
+        {t("regions.autoSlotsInfo")} <b>{brigadeCount}</b> {t("candidates.doctors")} {t("common.and")}{" "}
+        <b>{brigadeCount * 4}</b> {t("candidates.nurses")}.
       </div>
       <div className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-700">Название региона</label>
+          <label className="mb-1 block text-xs font-medium text-slate-700">{t("regions.regionName")}</label>
           <input
             type="text"
             value={name}
@@ -64,7 +84,7 @@ export function RegionCreateForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-700">Количество бригад</label>
+          <label className="mb-1 block text-xs font-medium text-slate-700">{t("regions.brigadeCount")}</label>
           <input
             type="number"
             min={1}
@@ -78,7 +98,7 @@ export function RegionCreateForm() {
           disabled={loading}
           className="mt-5 rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
-          {loading ? "Создание..." : "Создать регион"}
+          {loading ? t("regions.creating") : t("regions.createRegion")}
         </button>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}

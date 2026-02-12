@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "@/lib/i18n";
 
 interface ModuleCandidate {
   id: number;
@@ -19,6 +20,7 @@ interface ModuleCandidate {
 }
 
 export default function ModulesPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const [moduleNumber, setModuleNumber] = useState<1 | 2 | 3 | 4>(1);
   const [data, setData] = useState<ModuleCandidate[]>([]);
@@ -33,7 +35,7 @@ export default function ModulesPage() {
     setError(null);
     try {
       const res = await fetch(`/api/modules?moduleNumber=${mod}`);
-      if (!res.ok) throw new Error("Ошибка загрузки модулей");
+      if (!res.ok) throw new Error(t("modules.loadingError"));
       const json = await res.json();
       const mapped: ModuleCandidate[] = json.map((c: any) => {
         const certKey =
@@ -65,7 +67,7 @@ export default function ModulesPage() {
       setData(mapped);
       setInfo(null);
     } catch (e: any) {
-      setError(e.message ?? "Ошибка загрузки");
+      setError(e.message ?? t("modules.loadingError"));
     } finally {
       setLoading(false);
     }
@@ -90,9 +92,9 @@ export default function ModulesPage() {
     });
     const json = await res.json().catch(() => null);
     if (!res.ok) {
-      throw new Error(json?.error ?? "Ошибка сохранения результата модуля");
+      throw new Error(json?.error ?? t("modules.saveError"));
     }
-    setInfo("Результат модуля сохранен");
+    setInfo(t("modules.resultSaved"));
     await load(moduleNumber);
   }
 
@@ -109,9 +111,9 @@ export default function ModulesPage() {
     });
     const json = await res.json().catch(() => null);
     if (!res.ok) {
-      throw new Error(json?.error ?? "Ошибка обновления сертификата");
+      throw new Error(json?.error ?? t("modules.certUpdateError"));
     }
-    setInfo("Информация по сертификату обновлена");
+    setInfo(t("modules.certUpdated"));
     await load(moduleNumber);
   }
 
@@ -130,16 +132,16 @@ export default function ModulesPage() {
     });
     if (!res.ok) {
       const json = await res.json().catch(() => null);
-      throw new Error(json?.error ?? "Ошибка обновления сертификата");
+      throw new Error(json?.error ?? t("modules.certUpdateError"));
     }
-    setInfo("Информация по сертификату обновлена");
+    setInfo(t("modules.certUpdated"));
     await load(moduleNumber);
   }
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Модули</h1>
+        <h1 className="text-xl font-semibold">{t("modules.title")}</h1>
         <div className="flex items-center gap-2 text-xs">
           {[1, 2, 3, 4].map((m) => (
             <button
@@ -149,7 +151,7 @@ export default function ModulesPage() {
                 moduleNumber === m ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
               }`}
             >
-              Модуль {m}
+              {t("modules.module")} {m}
             </button>
           ))}
         </div>
@@ -157,18 +159,16 @@ export default function ModulesPage() {
 
       <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
         <p>
-          Модуль 1: показываются только кандидаты с сертификатом 1-го модуля. На вкладке можно заранее указать
-          сертификат 2-го модуля (есть/нет), но в списке «Модуль 2» кандидат появится только после статуса «Сдал» по
-          модулю 1. Модули 2–4: показываются только те, кто сдал предыдущий модуль.
+          {t("modules.moduleInfo")}
         </p>
         <p className="mt-2 text-xs text-slate-600">
-          Регион может менять статусы сертификатов; результат экзамена выставляет только администратор.
+          {t("modules.regionCanChange")}
         </p>
       </section>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       {info && <p className="text-sm text-emerald-700">{info}</p>}
-      {loading && <p className="text-sm text-slate-600">Загрузка...</p>}
+      {loading && <p className="text-sm text-slate-600">{t("modules.loading")}</p>}
 
       <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
         <table className="min-w-full text-left text-sm">
@@ -176,13 +176,13 @@ export default function ModulesPage() {
             <tr>
               <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
                 <div className="flex flex-col gap-1.5">
-                  <span>Регион</span>
+                  <span>{t("modules.region")}</span>
                   <select
                     value={filterRegion}
                     onChange={(e) => setFilterRegion(e.target.value)}
                     className="max-w-[180px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700"
                   >
-                    <option value="">Все регионы</option>
+                    <option value="">{t("modules.allRegions")}</option>
                     {regionOptions.map((r) => (
                       <option key={r} value={r}>
                         {r}
@@ -193,31 +193,31 @@ export default function ModulesPage() {
               </th>
               <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
                 <div className="flex flex-col gap-1.5">
-                  <span>ФИО</span>
+                  <span>{t("candidates.fio")}</span>
                   <input
                     type="text"
-                    placeholder="Поиск по ФИО..."
+                    placeholder={t("modules.searchFio")}
                     value={filterFio}
                     onChange={(e) => setFilterFio(e.target.value)}
                     className="min-w-[120px] max-w-[200px] rounded border border-slate-300 px-2 py-1 text-xs font-normal text-slate-700 placeholder:text-slate-400"
                   />
                 </div>
               </th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">Профессия</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">Сертификат</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">Примечание (если нет)</th>
+              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("candidates.profession")}</th>
+              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.status")}</th>
+              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("candidates.addNote")}</th>
               {moduleNumber < 4 && (
                 <>
                   <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
-                    Сертификат (модуль {moduleNumber + 1})
+                    {t(`candidates.cert${moduleNumber + 1}`)}
                   </th>
                   <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
-                    Примечание (мод {moduleNumber + 1})
+                    {t("candidates.addNote")} ({t("modules.module")} {moduleNumber + 1})
                   </th>
                 </>
               )}
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">Статус экзамена</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">Установить статус экзамена</th>
+              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.status")}</th>
+              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.setStatus")}</th>
             </tr>
           </thead>
           <tbody>
@@ -225,7 +225,7 @@ export default function ModulesPage() {
               <tr key={c.id} className="border-t border-slate-100">
                 <td className="px-3 py-2 align-top">{c.regionName}</td>
                 <td className="px-3 py-2 align-top">{c.fullName}</td>
-                <td className="px-3 py-2 align-top">{c.profession === "DOCTOR" ? "Врач" : "Медсестра"}</td>
+                <td className="px-3 py-2 align-top">{c.profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses")}</td>
                 <td className="px-3 py-2 align-top">
                   <select
                     value={c.certValue ? "yes" : "no"}
@@ -241,8 +241,8 @@ export default function ModulesPage() {
                       }
                     }}
                   >
-                    <option value="yes">Есть</option>
-                    <option value="no">Нет</option>
+                    <option value="yes">{t("candidates.has")}</option>
+                    <option value="no">{t("candidates.no")}</option>
                   </select>
                 </td>
                 <td className="px-3 py-2 align-top">
@@ -250,7 +250,7 @@ export default function ModulesPage() {
                     <textarea
                       className="min-h-[40px] w-full min-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs"
                       defaultValue={c.certNote ?? ""}
-                      placeholder="Почему нет"
+                      placeholder={t("candidates.addNote")}
                       disabled={session?.user?.role !== "ADMIN"}
                       onBlur={async (e) => {
                         if (session?.user?.role !== "ADMIN") return;
@@ -294,7 +294,7 @@ export default function ModulesPage() {
                         <textarea
                           className="min-h-[40px] w-full min-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs"
                           defaultValue={c.nextCertNote ?? ""}
-                          placeholder="Почему нет"
+                          placeholder={t("candidates.addNote")}
                           disabled={session?.user?.role !== "ADMIN"}
                           onBlur={async (e) => {
                             if (session?.user?.role !== "ADMIN") return;
@@ -318,10 +318,10 @@ export default function ModulesPage() {
                   {c.latestStatus
                     ? (
                         {
-                          PASSED: "Сдал",
-                          FAILED: "Не сдал",
-                          NO_SHOW_1: "Не пришёл 1 раз",
-                          NO_SHOW_2: "Не пришёл 2 раз"
+                          PASSED: t("modules.passed"),
+                          FAILED: t("modules.failed"),
+                          NO_SHOW_1: t("modules.noShow1"),
+                          NO_SHOW_2: t("modules.noShow2")
                         } as Record<string, string>
                       )[c.latestStatus] ?? c.latestStatus
                     : "—"}
@@ -343,18 +343,18 @@ export default function ModulesPage() {
                         }
                       }}
                     >
-                      <option value="">Выбрать...</option>
-                      <option value="PASSED">Сдал</option>
-                      <option value="FAILED">Не сдал</option>
-                      <option value="NO_SHOW_1">Не пришёл 1 раз</option>
-                      <option value="NO_SHOW_2">Не пришёл 2 раз</option>
+                      <option value="">{t("common.filter")}...</option>
+                      <option value="PASSED">{t("modules.passed")}</option>
+                      <option value="FAILED">{t("modules.failed")}</option>
+                      <option value="NO_SHOW_1">{t("modules.noShow1")}</option>
+                      <option value="NO_SHOW_2">{t("modules.noShow2")}</option>
                     </select>
                   ) : session?.user?.role === "ADMIN" && !c.certValue ? (
-                    <span className="text-xs text-slate-500">Сначала укажите сертификат «Есть»</span>
+                    <span className="text-xs text-slate-500">{t("candidates.addNote")}</span>
                   ) : session?.user?.role === "ADMIN" && !c.eligible ? (
-                    <span className="text-xs text-slate-500">Не допущен (пред. модуль или сертификат)</span>
+                    <span className="text-xs text-slate-500">{t("modules.notEligible")}</span>
                   ) : session?.user?.role !== "ADMIN" ? (
-                    <span className="text-xs text-slate-500">Только админ</span>
+                    <span className="text-xs text-slate-500">{t("modules.adminOnly")}</span>
                   ) : null}
                 </td>
               </tr>
@@ -362,7 +362,7 @@ export default function ModulesPage() {
             {filteredData.length === 0 && !loading && (
               <tr>
                 <td className="px-3 py-4 text-center text-sm text-slate-500" colSpan={moduleNumber < 4 ? 9 : 7}>
-                  Нет кандидатов для этого модуля
+                  {t("modules.noCandidates")}
                 </td>
               </tr>
             )}

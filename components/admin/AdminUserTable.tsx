@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
 
 type User = {
   id: number;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function AdminUserTable({ users }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [editUser, setEditUser] = useState<User | null>(null);
   const [login, setLogin] = useState("");
@@ -40,7 +42,7 @@ export function AdminUserTable({ users }: Props) {
   async function handleSave() {
     if (!editUser) return;
     if (!login.trim()) {
-      setError("Введите логин");
+      setError(t("admin.enterLogin"));
       return;
     }
     setLoading(true);
@@ -59,13 +61,13 @@ export function AdminUserTable({ users }: Props) {
       });
       const json = await res.json().catch(() => null);
       if (!res.ok) {
-        setError(json?.error ?? "Ошибка сохранения");
+        setError(json?.error ?? t("common.error"));
         return;
       }
       closeEdit();
       router.refresh();
     } catch (e: any) {
-      setError(e.message ?? "Ошибка");
+      setError(e.message ?? t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -79,10 +81,10 @@ export function AdminUserTable({ users }: Props) {
         <thead className="bg-slate-50 text-xs uppercase text-slate-500">
           <tr>
             <th className="px-3 py-2">ID</th>
-            <th className="px-3 py-2">Логин</th>
-            <th className="px-3 py-2">Роль</th>
-            <th className="px-3 py-2">Регион</th>
-            <th className="px-3 py-2">Действия</th>
+            <th className="px-3 py-2">{t("admin.login")}</th>
+            <th className="px-3 py-2">{t("common.role")}</th>
+            <th className="px-3 py-2">{t("admin.region")}</th>
+            <th className="px-3 py-2">{t("common.filter")}</th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +100,7 @@ export function AdminUserTable({ users }: Props) {
                   onClick={() => openEdit(u)}
                   className="rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
                 >
-                  Редактировать
+                  {t("admin.edit")}
                 </button>
               </td>
             </tr>
@@ -112,21 +114,21 @@ export function AdminUserTable({ users }: Props) {
             className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-sm font-semibold text-slate-800">Редактирование пользователя</h3>
+            <h3 className="text-sm font-semibold text-slate-800">{t("admin.editUser")}</h3>
             <div className="mt-3 space-y-2">
-              <label className="block text-xs font-medium text-slate-600">Логин</label>
+              <label className="block text-xs font-medium text-slate-600">{t("admin.login")}</label>
               <input
                 type="text"
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
                 className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
               />
-              <label className="block text-xs font-medium text-slate-600">Новый пароль (оставьте пустым, чтобы не менять)</label>
+              <label className="block text-xs font-medium text-slate-600">{t("admin.newPassword")}</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Не менять"
+                placeholder={t("admin.dontChange")}
                 className="w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
               />
             </div>
@@ -137,7 +139,7 @@ export function AdminUserTable({ users }: Props) {
                 onClick={closeEdit}
                 className="rounded border border-slate-300 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
               >
-                Отмена
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
@@ -145,7 +147,7 @@ export function AdminUserTable({ users }: Props) {
                 disabled={loading}
                 className="rounded bg-slate-900 px-3 py-1.5 text-xs text-white hover:bg-slate-800 disabled:opacity-60"
               >
-                {loading ? "Сохранение…" : "Сохранить"}
+                {loading ? t("common.loading") : t("admin.save")}
               </button>
             </div>
           </div>

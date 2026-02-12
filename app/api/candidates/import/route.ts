@@ -85,12 +85,12 @@ export async function POST(request: Request) {
   const reasonsOut: { rowIndex: number; reason: string }[] = [];
 
   if (mode === "add") {
-    const vacancies = candidates.filter((c) => !c.fullName || c.fullName.trim() === "");
+    const vacancies = candidates.filter((c: any) => !c.fullName || c.fullName.trim() === "");
     vacanciesCount = vacancies.length;
     const toImport = validRows.filter((r) => r.fullName);
     const max = Math.min(toImport.length, vacancies.length);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       for (let i = 0; i < max; i++) {
         const row = toImport[i];
         const vacancy = vacancies[i];
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
     }
   } else {
     // overwrite: первые N слотов заполняем из файла, остальные очищаем
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       for (let i = 0; i < candidates.length; i++) {
         const slot = candidates[i];
         const newName = i < validRows.length ? validRows[i].fullName : "";

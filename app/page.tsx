@@ -1,65 +1,75 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+"use client";
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions);
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n";
+import { useEffect } from "react";
+
+export default function HomePage() {
+  const { data: session, status } = useSession();
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.replace("/login");
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="mx-auto max-w-6xl">
+        <p className="text-slate-600">{t("common.loading")}</p>
+      </div>
+    );
+  }
 
   if (!session) {
-    redirect("/login");
+    return null;
   }
 
   const role = session.user.role;
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">
-      <h1 className="text-2xl font-semibold">Рабочий кабинет</h1>
+      <h1 className="text-2xl font-semibold">{t("home.title")}</h1>
       <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
         {role === "ADMIN" ? (
-          <p>
-            Вы вошли как администратор. Сначала создайте регионы и медбригады, затем назначьте региональных
-            пользователей и контролируйте заполнение и результаты модулей.
-          </p>
+          <p>{t("home.adminIntro")}</p>
         ) : (
-          <p>
-            Вы вошли как региональный пользователь. Заполните кандидатов по своему региону, затем выставляйте
-            результаты модулей и отслеживайте статистику.
-          </p>
+          <p>{t("home.regionIntro")}</p>
         )}
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/regions" className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300">
-          <h2 className="text-sm font-semibold">Регионы</h2>
-          <p className="mt-2 text-xs text-slate-600">Создание регионов и контроль количества бригад/слотов.</p>
+          <h2 className="text-sm font-semibold">{t("home.regionsCardTitle")}</h2>
+          <p className="mt-2 text-xs text-slate-600">{t("home.regionsCardDesc")}</p>
         </Link>
         <Link
           href="/candidates"
           className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300"
         >
-          <h2 className="text-sm font-semibold">Кандидаты</h2>
-          <p className="mt-2 text-xs text-slate-600">Заполнение VACANT-мест и импорт Excel по профессии.</p>
+          <h2 className="text-sm font-semibold">{t("home.candidatesCardTitle")}</h2>
+          <p className="mt-2 text-xs text-slate-600">{t("home.candidatesCardDesc")}</p>
         </Link>
         <Link href="/modules" className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300">
-          <h2 className="text-sm font-semibold">Модули</h2>
-          <p className="mt-2 text-xs text-slate-600">Выставление статусов PASSED/FAILED/NO_SHOW с учетом правил.</p>
+          <h2 className="text-sm font-semibold">{t("home.modulesCardTitle")}</h2>
+          <p className="mt-2 text-xs text-slate-600">{t("home.modulesCardDesc")}</p>
         </Link>
         <Link
           href="/statistics"
           className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300"
         >
-          <h2 className="text-sm font-semibold">Статистика</h2>
-          <p className="mt-2 text-xs text-slate-600">Оперативные показатели и экспорт отчета в Excel.</p>
+          <h2 className="text-sm font-semibold">{t("home.statisticsCardTitle")}</h2>
+          <p className="mt-2 text-xs text-slate-600">{t("home.statisticsCardDesc")}</p>
         </Link>
       </div>
 
       {role === "ADMIN" && (
         <Link href="/admin" className="inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-          Перейти в админ-панель
+          {t("home.goToAdmin")}
         </Link>
       )}
     </div>
   );
 }
-

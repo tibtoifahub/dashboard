@@ -50,13 +50,13 @@ export async function GET() {
     const totalSlots = items.length;
     const filled = items.filter(isFilled).length;
     const vacant = totalSlots - filled;
-    const doctorsFilled = items.filter((c) => c.profession === "DOCTOR" && isFilled(c)).length;
-    const nursesFilled = items.filter((c) => c.profession === "NURSE" && isFilled(c)).length;
+    const doctorsFilled = items.filter((c: any) => c.profession === "DOCTOR" && isFilled(c)).length;
+    const nursesFilled = items.filter((c: any) => c.profession === "NURSE" && isFilled(c)).length;
 
-    const cert1 = items.filter((c) => c.cert1).length;
-    const cert2 = items.filter((c) => c.cert2).length;
-    const cert3 = items.filter((c) => c.cert3).length;
-    const cert4 = items.filter((c) => c.cert4).length;
+    const cert1 = items.filter((c: any) => c.cert1).length;
+    const cert2 = items.filter((c: any) => c.cert2).length;
+    const cert3 = items.filter((c: any) => c.cert3).length;
+    const cert4 = items.filter((c: any) => c.cert4).length;
 
     const modules = emptyModuleBuckets();
     for (const c of items) {
@@ -87,7 +87,7 @@ export async function GET() {
   };
 
   const globalMetrics = computeRegionMetrics(candidates);
-  const perRegionMetrics = regions.map((r) => ({
+  const perRegionMetrics = regions.map((r: any) => ({
     id: r.id,
     name: r.name,
     metrics: computeRegionMetrics(r.candidates as any)
@@ -176,7 +176,7 @@ export async function GET() {
       ["Медсестра", "NURSE"]
     ] as const
   ).forEach(([label, prof]) => {
-    const list = candidates.filter((c) => c.profession === prof);
+    const list = candidates.filter((c: any) => c.profession === prof);
     let total = 0;
     let cert1 = 0;
     let module1Passed = 0;

@@ -1,3 +1,9 @@
+// Копия схемы для продакшена на MySQL (хостинг с Plesk).
+// Перед деплоем: скопируйте этот файл поверх schema.prisma
+//   либо замените в schema.prisma блок datasource на:
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -68,7 +74,7 @@ model Candidate {
   cert2        Boolean        @default(false)
   cert3        Boolean        @default(false)
   cert4        Boolean        @default(false)
-  cert1Note    String?        
+  cert1Note    String?
   cert2Note    String?
   cert3Note    String?
   cert4Note    String?
@@ -94,4 +100,3 @@ model ModuleResult {
   @@unique([candidateId, moduleNumber, attemptNumber])
   @@index([candidateId, moduleNumber])
 }
-

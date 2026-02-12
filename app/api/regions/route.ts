@@ -12,26 +12,71 @@ export async function GET() {
   const role = session.user.role;
   const regionId = session.user.regionId ?? undefined;
 
-  if (role === "ADMIN") {
-    const regions = await prisma.region.findMany({
-      include: {
-        brigades: true,
-        candidates: true
-      },
-      orderBy: { id: "asc" }
-    });
-    return NextResponse.json(regions);
-  }
+  try {
+    if (role === "ADMIN") {
+      const regions = await prisma.region.findMany({
+        include: {
+          brigades: {
+            select: {
+              id: true,
+              name: true,
+              regionId: true,
+              createdAt: true,
+              updatedAt: true
+            }
+          },
+          candidates: {
+            select: {
+              id: true,
+              fullName: true,
+              pinfl: true,
+              profession: true,
+              regionId: true,
+              brigadeId: true
+            }
+          }
+        },
+        orderBy: { id: "asc" }
+      });
+      return NextResponse.json(regions);
+    }
 
-  if (role === "REGION" && regionId) {
-    const region = await prisma.region.findUnique({
-      where: { id: regionId },
-      include: { brigades: true, candidates: true }
-    });
-    return NextResponse.json(region ? [region] : []);
-  }
+    if (role === "REGION" && regionId) {
+      const region = await prisma.region.findUnique({
+        where: { id: regionId },
+        include: {
+          brigades: {
+            select: {
+              id: true,
+              name: true,
+              regionId: true,
+              createdAt: true,
+              updatedAt: true
+            }
+          },
+          candidates: {
+            select: {
+              id: true,
+              fullName: true,
+              pinfl: true,
+              profession: true,
+              regionId: true,
+              brigadeId: true
+            }
+          }
+        }
+      });
+      return NextResponse.json(region ? [region] : []);
+    }
 
-  return NextResponse.json([], { status: 200 });
+    return NextResponse.json([], { status: 200 });
+  } catch (error: any) {
+    console.error("Error fetching regions:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to fetch regions" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -51,48 +96,87 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "name and brigadeCount are required" }, { status: 400 });
   }
 
-  const result = await prisma.$transaction(async (tx) => {
-    const region = await tx.region.create({
-      data: { name }
-    });
-
-    for (let i = 0; i < brigadeCount; i++) {
-      const brigade = await tx.medicalBrigade.create({
-        data: {
-          name: `Brigade ${i + 1}`,
-          regionId: region.id
-        }
+  try {
+    const result = await prisma.$transaction(async (tx: any) => {
+      // Создаем регион
+      const region = await tx.region.create({
+        data: { name: name.trim() }
       });
 
-      // 1 doctor slot
-      await tx.candidate.create({
-        data: {
+      // Подготавливаем данные для массового создания бригад
+      const brigadesData = Array.from({ length: brigadeCount }, (_, i) => ({
+        name: `Brigade ${i + 1}`,
+        regionId: region.id
+      }));
+
+      // Массовое создание бригад
+      const brigades = await Promise.all(
+        brigadesData.map((data) => tx.medicalBrigade.create({ data }))
+      );
+
+      // Подготавливаем данные для массового создания кандидатов
+      const candidatesData: Array<{
+        fullName: string;
+        pinfl: string;
+        profession: "DOCTOR" | "NURSE";
+        regionId: number;
+        brigadeId: number;
+      }> = [];
+
+      brigades.forEach((brigade) => {
+        // 1 doctor slot
+        candidatesData.push({
           fullName: "",
           pinfl: `VACANT-D-${region.id}-${brigade.id}`,
           profession: "DOCTOR",
           regionId: region.id,
           brigadeId: brigade.id
-        }
-      });
+        });
 
-      // 4 nurse slots
-      for (let j = 0; j < 4; j++) {
-        await tx.candidate.create({
-          data: {
+        // 4 nurse slots
+        for (let j = 0; j < 4; j++) {
+          candidatesData.push({
             fullName: "",
             pinfl: `VACANT-N-${region.id}-${brigade.id}-${j + 1}`,
             profession: "NURSE",
             regionId: region.id,
             brigadeId: brigade.id
-          }
+          });
+        }
+      });
+
+      // Массовое создание кандидатов (разбиваем на батчи по 100 для избежания проблем с размером запроса)
+      const batchSize = 100;
+      for (let i = 0; i < candidatesData.length; i += batchSize) {
+        const batch = candidatesData.slice(i, i + batchSize);
+        await tx.candidate.createMany({
+          data: batch,
+          skipDuplicates: true
         });
       }
+
+      return region;
+    }, {
+      timeout: 30000, // 30 секунд таймаут для больших транзакций
+    });
+
+    return NextResponse.json(result, { status: 201 });
+  } catch (error: any) {
+    console.error("Error creating region:", error);
+    
+    // Проверяем на уникальность имени региона (Prisma error code P2002)
+    if (error.code === "P2002" || error.message?.includes("Unique constraint") || error.message?.includes("unique")) {
+      return NextResponse.json(
+        { error: "Region with this name already exists" },
+        { status: 409 }
+      );
     }
 
-    return region;
-  });
-
-  return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(
+      { error: error.message || "Failed to create region" },
+      { status: 500 }
+    );
+  }
 }
 
 // PATCH /api/regions — изменить число мед. бригад региона (только админ)
@@ -134,46 +218,78 @@ export async function PATCH(request: Request) {
 
   if (newCount > currentCount) {
     const toAdd = newCount - currentCount;
-    await prisma.$transaction(async (tx) => {
-      for (let i = 0; i < toAdd; i++) {
-        const brigade = await tx.medicalBrigade.create({
-          data: {
-            name: `Brigade ${currentCount + i + 1}`,
-            regionId: id
-          }
-        });
-        await tx.candidate.create({
-          data: {
+    try {
+      await prisma.$transaction(async (tx: any) => {
+        // Создаем все бригады параллельно
+        const brigadesData = Array.from({ length: toAdd }, (_, i) => ({
+          name: `Brigade ${currentCount + i + 1}`,
+          regionId: id
+        }));
+
+        const brigades = await Promise.all(
+          brigadesData.map((data) => tx.medicalBrigade.create({ data }))
+        );
+
+        // Подготавливаем данные для массового создания кандидатов
+        const candidatesData: Array<{
+          fullName: string;
+          pinfl: string;
+          profession: "DOCTOR" | "NURSE";
+          regionId: number;
+          brigadeId: number;
+        }> = [];
+
+        brigades.forEach((brigade) => {
+          // 1 doctor slot
+          candidatesData.push({
             fullName: "",
             pinfl: `VACANT-D-${id}-${brigade.id}`,
             profession: "DOCTOR",
             regionId: id,
             brigadeId: brigade.id
-          }
-        });
-        for (let j = 0; j < 4; j++) {
-          await tx.candidate.create({
-            data: {
+          });
+
+          // 4 nurse slots
+          for (let j = 0; j < 4; j++) {
+            candidatesData.push({
               fullName: "",
               pinfl: `VACANT-N-${id}-${brigade.id}-${j + 1}`,
               profession: "NURSE",
               regionId: id,
               brigadeId: brigade.id
-            }
+            });
+          }
+        });
+
+        // Массовое создание кандидатов
+        const batchSize = 100;
+        for (let i = 0; i < candidatesData.length; i += batchSize) {
+          const batch = candidatesData.slice(i, i + batchSize);
+          await tx.candidate.createMany({
+            data: batch,
+            skipDuplicates: true
           });
         }
-      }
-    });
+      }, {
+        timeout: 30000,
+      });
+    } catch (error: any) {
+      console.error("Error updating brigades:", error);
+      return NextResponse.json(
+        { error: error.message || "Failed to update brigades" },
+        { status: 500 }
+      );
+    }
   } else {
     const toRemove = currentCount - newCount;
-    const brigadesToDelete = region.brigades.slice(-toRemove).map((b) => b.id);
+    const brigadesToDelete = region.brigades.slice(-toRemove).map((b: any) => b.id);
     const candidates = await prisma.candidate.findMany({
       where: { brigadeId: { in: brigadesToDelete } },
       select: { id: true }
     });
-    const candidateIds = candidates.map((c) => c.id);
+    const candidateIds = candidates.map((c: any) => c.id);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       if (candidateIds.length > 0) {
         await tx.moduleResult.deleteMany({ where: { candidateId: { in: candidateIds } } });
       }
@@ -209,9 +325,9 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Region not found" }, { status: 404 });
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     const candidates = await tx.candidate.findMany({ where: { regionId: id }, select: { id: true } });
-    const candidateIds = candidates.map((c) => c.id);
+    const candidateIds = candidates.map((c: any) => c.id);
     if (candidateIds.length > 0) {
       await tx.moduleResult.deleteMany({ where: { candidateId: { in: candidateIds } } });
     }

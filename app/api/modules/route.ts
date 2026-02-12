@@ -24,7 +24,7 @@ async function isCandidateEligible(candidateId: number, moduleNumber: number) {
   if (!candidate) return false;
 
   const hasPassed = (module: number) =>
-    candidate.moduleResults.some((mr) => mr.moduleNumber === module && mr.status === "PASSED");
+    candidate.moduleResults.some((mr: any) => mr.moduleNumber === module && mr.status === "PASSED");
 
   const passedAllExamsBefore = (n: number) => {
     for (let m = 1; m < n; m++) {
@@ -88,11 +88,11 @@ export async function GET(request: Request) {
 
   const filtered =
     moduleNumber === 1
-      ? candidates.filter((c) => c.cert1 === true)
-      : candidates.filter((c) => passedAllPrevious(c, moduleNumber));
+      ? candidates.filter((c: any) => c.cert1 === true)
+      : candidates.filter((c: any) => passedAllPrevious(c, moduleNumber));
 
   const withEligible = await Promise.all(
-    filtered.map(async (c) => ({
+    filtered.map(async (c: any) => ({
       ...c,
       eligible: await isCandidateEligible(c.id, moduleNumber)
     }))
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 
   // Администратор может менять статус экзамена без ограничений:
   // просто перезаписываем (или создаём) одну запись на модуль.
-  const existing = candidate.moduleResults.find((mr) => mr.moduleNumber === moduleNumber);
+  const existing = candidate.moduleResults.find((mr: any) => mr.moduleNumber === moduleNumber);
 
   let result;
   if (existing) {
