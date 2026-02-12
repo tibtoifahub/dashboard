@@ -66,7 +66,7 @@ export default function RegionsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">{t("regions.title")}</h1>
       </div>
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <section className="rounded-lg border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         <p>
           {t("regions.info")}
         </p>

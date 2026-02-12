@@ -516,7 +516,7 @@ export default function CandidatesPage() {
         </div>
       </div>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <section className="rounded-lg border-2 border-emerald-100 bg-gradient-to-r from-emerald-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         <p>
           {t("candidates.info")}
         </p>
@@ -531,8 +531,8 @@ export default function CandidatesPage() {
       {loading && <p className="text-sm text-slate-600">{t("common.loading")}</p>}
 
       {!loading && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700">
+        <section className="space-y-3 rounded-lg border-2 border-slate-200 bg-white p-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-800">
             {profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses")}
           </h2>
           <DataTable columns={columns} data={filteredData} />
@@ -540,7 +540,7 @@ export default function CandidatesPage() {
       )}
 
       {importResult && (
-        <div className="rounded-md bg-slate-50 p-3 text-xs text-slate-700">
+        <div className="rounded-lg border-2 border-emerald-200 bg-gradient-to-r from-emerald-50 to-white p-4 text-xs text-slate-700 shadow-sm">
           <div>
             {t("candidates.imported")}: <b>{importResult.imported}</b>, {t("candidates.skipped")}: <b>{importResult.skipped}</b>
             {importResult.vacanciesCount !== undefined && (

@@ -68,26 +68,32 @@ export function AdminRegionsList({ regions }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <table className="min-w-full text-left text-sm">
-        <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-          <tr>
-            <th className="px-3 py-2">ID</th>
-            <th className="px-3 py-2">{t("admin.region")}</th>
-            <th className="px-3 py-2">{t("admin.brigades")}</th>
-            <th className="px-3 py-2">{t("common.filter")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {regions.map((r) => {
+      <div className="overflow-x-auto rounded-lg border-2 border-slate-200 bg-white shadow-md">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-gradient-to-r from-slate-700 to-slate-600 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
+            <tr>
+              <th className="px-4 py-3">ID</th>
+              <th className="px-4 py-3">{t("admin.region")}</th>
+              <th className="px-4 py-3">{t("admin.brigades")}</th>
+              <th className="px-4 py-3">{t("common.filter")}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {regions.map((r, idx) => {
             const brigadeCount = r.brigades?.length ?? 0;
             const isEditing = editingId === r.id;
             return (
-              <tr key={r.id} className="border-t border-slate-100">
-                <td className="px-3 py-2">{r.id}</td>
-                <td className="px-3 py-2">{r.name}</td>
-                <td className="px-3 py-2">
+              <tr 
+                key={r.id} 
+                className={`border-t border-slate-100 transition-colors ${
+                  idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                } hover:bg-red-50 hover:shadow-sm`}
+              >
+                <td className="px-4 py-3">{r.id}</td>
+                <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
+                <td className="px-4 py-3">
                   {isEditing ? (
                     <span className="flex items-center gap-2">
                       <input
@@ -102,7 +108,7 @@ export function AdminRegionsList({ regions }: Props) {
                         type="button"
                         onClick={() => handleSaveBrigadeCount(r.id)}
                         disabled={saving}
-                        className="rounded bg-slate-800 px-2 py-1 text-xs text-white hover:bg-slate-700 disabled:opacity-50"
+                        className="rounded-md border-2 border-slate-800 bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 hover:border-slate-700 disabled:opacity-50 transition-colors"
                       >
                         {saving ? t("common.loading") : t("admin.save")}
                       </button>
@@ -110,7 +116,7 @@ export function AdminRegionsList({ regions }: Props) {
                         type="button"
                         onClick={() => { setEditingId(null); setError(null); }}
                         disabled={saving}
-                        className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                        className="rounded-md border-2 border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-colors"
                       >
                         {t("common.cancel")}
                       </button>
@@ -119,7 +125,7 @@ export function AdminRegionsList({ regions }: Props) {
                     brigadeCount
                   )}
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-4 py-3">
                   <span className="flex flex-wrap items-center gap-2">
                     {!isEditing && (
                       <button
@@ -129,7 +135,7 @@ export function AdminRegionsList({ regions }: Props) {
                           setEditBrigadeCount(brigadeCount || 1);
                           setError(null);
                         }}
-                        className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                        className="rounded-md border-2 border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-colors"
                       >
                         {t("admin.changeBrigades")}
                       </button>
@@ -141,7 +147,7 @@ export function AdminRegionsList({ regions }: Props) {
                           type="button"
                           onClick={() => handleDelete(r.id)}
                           disabled={deletingId !== null}
-                          className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700 disabled:opacity-50"
+                          className="rounded-md border-2 border-red-600 bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 hover:border-red-700 disabled:opacity-50 transition-colors"
                         >
                           {deletingId === r.id ? t("common.loading") : t("common.yes")}
                         </button>
@@ -149,7 +155,7 @@ export function AdminRegionsList({ regions }: Props) {
                           type="button"
                           onClick={() => setConfirmId(null)}
                           disabled={deletingId !== null}
-                          className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                          className="rounded-md border-2 border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-colors"
                         >
                           {t("common.no")}
                         </button>
@@ -158,7 +164,7 @@ export function AdminRegionsList({ regions }: Props) {
                       <button
                         type="button"
                         onClick={() => setConfirmId(r.id)}
-                        className="rounded border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
+                        className="rounded-md border-2 border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 hover:border-red-400 transition-colors"
                       >
                         {t("admin.delete")}
                       </button>
@@ -168,8 +174,9 @@ export function AdminRegionsList({ regions }: Props) {
               </tr>
             );
           })}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
       <p className="text-xs text-slate-500">
         {t("admin.brigadeChangeInfo")}
       </p>

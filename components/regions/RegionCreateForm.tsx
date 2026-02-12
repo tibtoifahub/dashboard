@@ -68,8 +68,8 @@ export function RegionCreateForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="rounded-md bg-blue-50 p-3 text-xs text-blue-800">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-white p-5 shadow-md">
+      <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4 text-xs font-medium text-blue-800 shadow-sm">
         {t("regions.autoSlotsInfo")} <b>{brigadeCount}</b> {t("candidates.doctors")} {t("common.and")}{" "}
         <b>{brigadeCount * 4}</b> {t("candidates.nurses")}.
       </div>
@@ -80,7 +80,7 @@ export function RegionCreateForm() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-64 rounded-md border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+            className="w-64 rounded-md border-2 border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
           />
         </div>
         <div>
@@ -90,13 +90,13 @@ export function RegionCreateForm() {
             min={1}
             value={brigadeCount}
             onChange={(e) => setBrigadeCount(Number(e.target.value) || 1)}
-            className="w-32 rounded-md border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+            className="w-32 rounded-md border-2 border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="mt-5 rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="mt-5 rounded-md border-2 border-slate-900 bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800 hover:border-slate-800 disabled:opacity-60 transition-colors shadow-md"
         >
           {loading ? t("regions.creating") : t("regions.createRegion")}
         </button>

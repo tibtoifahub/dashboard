@@ -157,7 +157,7 @@ export default function ModulesPage() {
         </div>
       </div>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <section className="rounded-lg border-2 border-amber-100 bg-gradient-to-r from-amber-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         <p>
           {t("modules.moduleInfo")}
         </p>
@@ -170,11 +170,11 @@ export default function ModulesPage() {
       {info && <p className="text-sm text-emerald-700">{info}</p>}
       {loading && <p className="text-sm text-slate-600">{t("modules.loading")}</p>}
 
-      <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border-2 border-slate-200 bg-white shadow-sm">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+          <thead className="bg-gradient-to-r from-slate-700 to-slate-600 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
             <tr>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">
                 <div className="flex flex-col gap-1.5">
                   <span>{t("modules.region")}</span>
                   <select
@@ -191,7 +191,7 @@ export default function ModulesPage() {
                   </select>
                 </div>
               </th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">
                 <div className="flex flex-col gap-1.5">
                   <span>{t("candidates.fio")}</span>
                   <input
@@ -203,30 +203,35 @@ export default function ModulesPage() {
                   />
                 </div>
               </th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("candidates.profession")}</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.status")}</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("candidates.addNote")}</th>
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">{t("candidates.profession")}</th>
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">{t("modules.status")}</th>
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">{t("candidates.addNote")}</th>
               {moduleNumber < 4 && (
                 <>
-                  <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
+                  <th className="min-h-[52px] px-4 py-3 text-left font-semibold">
                     {t(`candidates.cert${moduleNumber + 1}`)}
                   </th>
-                  <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">
+                  <th className="min-h-[52px] px-4 py-3 text-left font-semibold">
                     {t("candidates.addNote")} ({t("modules.module")} {moduleNumber + 1})
                   </th>
                 </>
               )}
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.status")}</th>
-              <th className="min-h-[44px] px-3 py-2.5 text-left font-medium">{t("modules.setStatus")}</th>
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">{t("modules.status")}</th>
+              <th className="min-h-[52px] px-4 py-3 text-left font-semibold">{t("modules.setStatus")}</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredData.map((c) => (
-              <tr key={c.id} className="border-t border-slate-100">
-                <td className="px-3 py-2 align-top">{c.regionName}</td>
-                <td className="px-3 py-2 align-top">{c.fullName}</td>
-                <td className="px-3 py-2 align-top">{c.profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses")}</td>
-                <td className="px-3 py-2 align-top">
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {filteredData.map((c, idx) => (
+              <tr 
+                key={c.id} 
+                className={`border-t border-slate-100 transition-colors ${
+                  idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                } hover:bg-amber-50 hover:shadow-sm`}
+              >
+                <td className="px-4 py-3 align-top">{c.regionName}</td>
+                <td className="px-4 py-3 align-top">{c.fullName}</td>
+                <td className="px-4 py-3 align-top">{c.profession === "DOCTOR" ? t("candidates.doctors") : t("candidates.nurses")}</td>
+                <td className="px-4 py-3 align-top">
                   <select
                     value={c.certValue ? "yes" : "no"}
                     className="rounded border border-slate-300 px-2 py-1 text-xs"
@@ -245,7 +250,7 @@ export default function ModulesPage() {
                     <option value="no">{t("candidates.no")}</option>
                   </select>
                 </td>
-                <td className="px-3 py-2 align-top">
+                <td className="px-4 py-3 align-top">
                   {!c.certValue ? (
                     <textarea
                       className="min-h-[40px] w-full min-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs"
@@ -270,7 +275,7 @@ export default function ModulesPage() {
                 </td>
                 {moduleNumber < 4 && (
                   <>
-                    <td className="px-3 py-2 align-top">
+                    <td className="px-4 py-3 align-top">
                       <select
                         value={c.nextCertValue ? "yes" : "no"}
                         className="rounded border border-slate-300 px-2 py-1 text-xs"
@@ -285,11 +290,11 @@ export default function ModulesPage() {
                           }
                         }}
                       >
-                        <option value="yes">Есть</option>
-                        <option value="no">Нет</option>
+                        <option value="yes">{t("candidates.has")}</option>
+                        <option value="no">{t("candidates.no")}</option>
                       </select>
                     </td>
-                    <td className="px-3 py-2 align-top">
+                    <td className="px-4 py-3 align-top">
                       {!c.nextCertValue ? (
                         <textarea
                           className="min-h-[40px] w-full min-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs"
@@ -314,7 +319,7 @@ export default function ModulesPage() {
                     </td>
                   </>
                 )}
-                <td className="px-3 py-2 align-top">
+                <td className="px-4 py-3 align-top">
                   {c.latestStatus
                     ? (
                         {
@@ -326,7 +331,7 @@ export default function ModulesPage() {
                       )[c.latestStatus] ?? c.latestStatus
                     : "—"}
                 </td>
-                <td className="px-3 py-2 align-top">
+                <td className="px-4 py-3 align-top">
                   {session?.user?.role === "ADMIN" && c.certValue && c.eligible ? (
                     <select
                       defaultValue=""
@@ -361,7 +366,7 @@ export default function ModulesPage() {
             ))}
             {filteredData.length === 0 && !loading && (
               <tr>
-                <td className="px-3 py-4 text-center text-sm text-slate-500" colSpan={moduleNumber < 4 ? 9 : 7}>
+                <td className="px-4 py-8 text-center text-sm text-slate-500" colSpan={moduleNumber < 4 ? 9 : 7}>
                   {t("modules.noCandidates")}
                 </td>
               </tr>

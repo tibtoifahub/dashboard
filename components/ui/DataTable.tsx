@@ -8,6 +8,7 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -15,6 +16,7 @@ interface DataTableProps<TData> {
 }
 
 export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
+  const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(50);
 
   const table = useReactTable({
@@ -32,15 +34,15 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
 
   return (
     <div className="space-y-3">
-      <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border-2 border-slate-200 bg-white shadow-md">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+          <thead className="bg-gradient-to-r from-slate-700 to-slate-600 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="min-h-[52px] align-top px-3 py-2.5 text-left font-medium"
+                    className="min-h-[52px] align-top px-4 py-3 text-left font-semibold"
                   >
                     {header.isPlaceholder
                       ? null
@@ -50,11 +52,16 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
               </tr>
             ))}
           </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-slate-100 hover:bg-slate-50">
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {table.getRowModel().rows.map((row, idx) => (
+              <tr 
+                key={row.id} 
+                className={`border-t border-slate-100 transition-colors ${
+                  idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                } hover:bg-blue-50 hover:shadow-sm`}
+              >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-2 text-left align-top">
+                  <td key={cell.id} className="px-4 py-3 text-left align-top">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -62,8 +69,8 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
             ))}
             {table.getRowModel().rows.length === 0 && (
               <tr>
-                <td colSpan={columns.length} className="px-3 py-4 text-center text-sm text-slate-500">
-                  Нет данных
+                <td colSpan={columns.length} className="px-4 py-8 text-center text-sm text-slate-500">
+                  {t("common.noData")}
                 </td>
               </tr>
             )}
@@ -72,25 +79,25 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
       </div>
       <div className="flex items-center justify-between text-xs text-slate-600">
         <div>
-          Страница {table.getState().pagination.pageIndex + 1} из {table.getPageCount() || 1}
+          {t("common.page")} {table.getState().pagination.pageIndex + 1} {t("common.of")} {table.getPageCount() || 1}
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+            className="rounded border border-slate-300 bg-white px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Назад
+            {t("common.previous")}
           </button>
           <button
-            className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+            className="rounded border border-slate-300 bg-white px-3 py-1.5 font-medium hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Вперёд
+            {t("common.next")}
           </button>
           <select
-            className="rounded border border-slate-300 px-2 py-1"
+            className="rounded border border-slate-300 bg-white px-2 py-1.5 font-medium hover:bg-slate-50 transition-colors"
             value={pageSize}
             onChange={(e) => {
               const size = Number(e.target.value);
@@ -100,7 +107,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
           >
             {[25, 50, 100].map((size) => (
               <option key={size} value={size}>
-                {size}/стр
+                {size} {t("common.perPage")}
               </option>
             ))}
           </select>

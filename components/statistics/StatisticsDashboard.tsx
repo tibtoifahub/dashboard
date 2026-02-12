@@ -201,7 +201,7 @@ export function StatisticsDashboard({ role }: Props) {
         </a>
       </div>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <section className="rounded-lg border-2 border-purple-100 bg-gradient-to-r from-purple-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         {role === "ADMIN" ? (
           <p>
             Показаны агрегированные показатели по всем регионам. Экспорт выгружает полный аналитический отчёт (KPI,
@@ -216,42 +216,42 @@ export function StatisticsDashboard({ role }: Props) {
 
       {/* KPI cards */}
       <section className="grid gap-4 sm:grid-cols-4 lg:grid-cols-6">
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.totalSlots")}</div>
+        <div className="rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
+          <div className="text-xs font-medium uppercase text-blue-700">{t("statistics.totalSlots")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.totalSlots}</div>
           <p className="mt-1 text-xs text-slate-500">
             {t("statistics.totalSlotsDesc")}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.filled")}</div>
+        <div className="rounded-lg border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
+          <div className="text-xs font-medium uppercase text-emerald-700">{t("statistics.filled")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.filled}</div>
           <p className="mt-1 text-xs text-slate-500">
             {t("statistics.filledDesc")}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">{t("statistics.vacant")}</div>
+        <div className="rounded-lg border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
+          <div className="text-xs font-medium uppercase text-amber-700">{t("statistics.vacant")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.vacant}</div>
           <p className="mt-1 text-xs text-slate-500">
             {t("statistics.vacantDesc")}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">{t("candidates.doctors")}</div>
+        <div className="rounded-lg border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
+          <div className="text-xs font-medium uppercase text-indigo-700">{t("candidates.doctors")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.doctorsFilled}</div>
           <p className="mt-1 text-xs text-slate-500">
             {t("statistics.doctorsDesc")}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-medium uppercase text-slate-500">{t("candidates.nurses")}</div>
+        <div className="rounded-lg border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
+          <div className="text-xs font-medium uppercase text-pink-700">{t("candidates.nurses")}</div>
           <div className="mt-1 text-2xl font-semibold text-slate-900">{global.nursesFilled}</div>
           <p className="mt-1 text-xs text-slate-500">
             {t("statistics.nursesDesc")}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-sm">
+        <div className="rounded-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 shadow-md hover:shadow-lg transition-shadow">
           <div className="text-xs font-medium uppercase text-slate-500">Сертификат 1 и Модуль 4</div>
           <div className="mt-1 text-sm">
             <span className="font-semibold text-slate-900">{cert1Pct.toFixed(1)}%</span>{" "}
@@ -268,14 +268,14 @@ export function StatisticsDashboard({ role }: Props) {
       </section>
 
       {/* Region table — поднято над диаграммами */}
-      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-700">{t("statistics.byRegion")}</h2>
-        <p className="mb-3 text-xs text-slate-500">
+      <section className="rounded-lg border-2 border-slate-200 bg-white p-5 shadow-md">
+        <h2 className="text-sm font-semibold text-slate-800 mb-2">{t("statistics.byRegion")}</h2>
+        <p className="mb-4 text-xs text-slate-600">
           Подробная статистика по каждому региону: всего мест, вакансии, сертификат 1 (есть/нет), результаты экзаменов по модулям 1–4. Нажмите на заголовок для сортировки по основным колонкам.
         </p>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg border border-slate-200">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs text-slate-600">
+            <thead className="bg-gradient-to-r from-slate-700 to-slate-600 text-xs font-semibold text-white shadow-sm">
               <tr>
                 <th rowSpan={2} className="border-r border-slate-200 px-3 py-2 align-middle font-medium normal-case">
                   <button type="button" onClick={() => toggleRegionSort("name")}>{t("admin.region")}</button>
@@ -312,9 +312,14 @@ export function StatisticsDashboard({ role }: Props) {
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {regionTableSorted.map((r) => (
-                <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50/50">
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {regionTableSorted.map((r, idx) => (
+                <tr 
+                  key={r.id} 
+                  className={`border-t border-slate-100 transition-colors ${
+                    idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                  } hover:bg-purple-50 hover:shadow-sm`}
+                >
                   <td className="whitespace-nowrap border-r border-slate-200 px-3 py-2 font-medium text-slate-800">{r.name}</td>
                   <td className="border-r border-slate-200 px-3 py-2 text-right tabular-nums">{r.totalSlots}</td>
                   <td className="border-r-2 border-slate-300 px-3 py-2 text-right tabular-nums">{r.vacant}</td>

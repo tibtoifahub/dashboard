@@ -17,7 +17,13 @@
     "success": "Muvaffaqiyatli",
     "yes": "Ha",
     "no": "Yo'q",
-    "and": "va"
+    "and": "va",
+    "noData": "Ma'lumotlar yo'q",
+    "page": "Sahifa",
+    "of": "dan",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "perPage": "sahifada"
   },
   "nav": {
     "regions": "Hududlar",

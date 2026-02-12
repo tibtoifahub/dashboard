@@ -39,13 +39,13 @@ export default function AdminPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <h1 className="text-xl font-semibold">{t("admin.title")}</h1>
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <section className="rounded-lg border-2 border-slate-200 bg-gradient-to-r from-slate-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         <p>
           {t("admin.info")}
         </p>
       </section>
 
-      <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="space-y-3 rounded-lg border-2 border-slate-200 bg-white p-5 shadow-md">
         <h2 className="text-sm font-semibold">{t("admin.users")}</h2>
         <p className="text-xs text-slate-600">{t("admin.editInfo")}</p>
         {loading ? (
@@ -55,12 +55,12 @@ export default function AdminPage() {
         )}
       </section>
 
-      <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="space-y-3 rounded-lg border-2 border-slate-200 bg-white p-5 shadow-md">
         <h2 className="text-sm font-semibold">{t("admin.createUser")}</h2>
         <AdminCreateUserForm regions={regions} />
       </section>
 
-      <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="space-y-3 rounded-lg border-2 border-slate-200 bg-white p-5 shadow-md">
         <h2 className="text-sm font-semibold">{t("admin.editDatabase")}</h2>
         <p className="text-xs text-slate-600">{t("admin.editDatabaseInfo")}</p>
         {loading ? (

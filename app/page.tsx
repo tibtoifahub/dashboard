@@ -31,8 +31,8 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">
-      <h1 className="text-2xl font-semibold">{t("home.title")}</h1>
-      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <h1 className="text-2xl font-semibold text-slate-800">{t("home.title")}</h1>
+      <section className="rounded-lg border-2 border-slate-200 bg-gradient-to-r from-slate-50 to-white p-5 text-sm text-slate-700 shadow-sm">
         {role === "ADMIN" ? (
           <p>{t("home.adminIntro")}</p>
         ) : (
@@ -41,26 +41,44 @@ export default function HomePage() {
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/regions" className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300">
-          <h2 className="text-sm font-semibold">{t("home.regionsCardTitle")}</h2>
+        <Link 
+          href="/regions" 
+          className="group rounded-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-md transition-all hover:border-blue-400 hover:shadow-lg"
+        >
+          <div className="mb-2 flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+            <h2 className="text-sm font-semibold text-slate-800 group-hover:text-blue-700">{t("home.regionsCardTitle")}</h2>
+          </div>
           <p className="mt-2 text-xs text-slate-600">{t("home.regionsCardDesc")}</p>
         </Link>
         <Link
           href="/candidates"
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300"
+          className="group rounded-lg border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-md transition-all hover:border-emerald-400 hover:shadow-lg"
         >
-          <h2 className="text-sm font-semibold">{t("home.candidatesCardTitle")}</h2>
+          <div className="mb-2 flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+            <h2 className="text-sm font-semibold text-slate-800 group-hover:text-emerald-700">{t("home.candidatesCardTitle")}</h2>
+          </div>
           <p className="mt-2 text-xs text-slate-600">{t("home.candidatesCardDesc")}</p>
         </Link>
-        <Link href="/modules" className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300">
-          <h2 className="text-sm font-semibold">{t("home.modulesCardTitle")}</h2>
+        <Link 
+          href="/modules" 
+          className="group rounded-lg border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-md transition-all hover:border-amber-400 hover:shadow-lg"
+        >
+          <div className="mb-2 flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-amber-500"></div>
+            <h2 className="text-sm font-semibold text-slate-800 group-hover:text-amber-700">{t("home.modulesCardTitle")}</h2>
+          </div>
           <p className="mt-2 text-xs text-slate-600">{t("home.modulesCardDesc")}</p>
         </Link>
         <Link
           href="/statistics"
-          className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300"
+          className="group rounded-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5 shadow-md transition-all hover:border-purple-400 hover:shadow-lg"
         >
-          <h2 className="text-sm font-semibold">{t("home.statisticsCardTitle")}</h2>
+          <div className="mb-2 flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+            <h2 className="text-sm font-semibold text-slate-800 group-hover:text-purple-700">{t("home.statisticsCardTitle")}</h2>
+          </div>
           <p className="mt-2 text-xs text-slate-600">{t("home.statisticsCardDesc")}</p>
         </Link>
       </div>
